@@ -1,0 +1,440 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CE1B3B821423111C001460F9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE1B3B811423111C001460F9 /* UIKit.framework */; };
+		CE1B3B841423111C001460F9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE1B3B831423111C001460F9 /* Foundation.framework */; };
+		CE1B3B861423111C001460F9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE1B3B851423111C001460F9 /* CoreGraphics.framework */; };
+		CE1B3B8C1423111C001460F9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B3B8A1423111C001460F9 /* InfoPlist.strings */; };
+		CE1B3B8E1423111C001460F9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CE1B3B8D1423111C001460F9 /* main.m */; };
+		CE1B3B921423111C001460F9 /* GraphCalculatorAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CE1B3B911423111C001460F9 /* GraphCalculatorAppDelegate.m */; };
+		CE1B3B951423111C001460F9 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE1B3B931423111C001460F9 /* MainWindow.xib */; };
+		CE1B3B9D1423111C001460F9 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE1B3B9C1423111C001460F9 /* SenTestingKit.framework */; };
+		CE1B3B9E1423111C001460F9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE1B3B811423111C001460F9 /* UIKit.framework */; };
+		CE1B3B9F1423111C001460F9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE1B3B831423111C001460F9 /* Foundation.framework */; };
+		CE1B3BA01423111C001460F9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE1B3B851423111C001460F9 /* CoreGraphics.framework */; };
+		CE1B3BA81423111C001460F9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B3BA61423111C001460F9 /* InfoPlist.strings */; };
+		CE1B3BAA1423111C001460F9 /* GraphCalculatorTests.h in Resources */ = {isa = PBXBuildFile; fileRef = CE1B3BA91423111C001460F9 /* GraphCalculatorTests.h */; };
+		CE1B3BAC1423111C001460F9 /* GraphCalculatorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = CE1B3BAB1423111C001460F9 /* GraphCalculatorTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CE1B3BA11423111C001460F9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE1B3B741423111C001460F9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE1B3B7C1423111C001460F9;
+			remoteInfo = GraphCalculator;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CE1B3B7D1423111C001460F9 /* GraphCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GraphCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE1B3B811423111C001460F9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		CE1B3B831423111C001460F9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		CE1B3B851423111C001460F9 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		CE1B3B891423111C001460F9 /* GraphCalculator-Info.plist */ = {isa = PBXFileReference; path = "GraphCalculator-Info.plist"; sourceTree = "<group>"; };
+		CE1B3B8B1423111C001460F9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		CE1B3B8D1423111C001460F9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		CE1B3B8F1423111C001460F9 /* GraphCalculator-Prefix.pch */ = {isa = PBXFileReference; path = "GraphCalculator-Prefix.pch"; sourceTree = "<group>"; };
+		CE1B3B901423111C001460F9 /* GraphCalculatorAppDelegate.h */ = {isa = PBXFileReference; path = GraphCalculatorAppDelegate.h; sourceTree = "<group>"; };
+		CE1B3B911423111C001460F9 /* GraphCalculatorAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GraphCalculatorAppDelegate.m; sourceTree = "<group>"; };
+		CE1B3B941423111C001460F9 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		CE1B3B9B1423111C001460F9 /* GraphCalculatorTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GraphCalculatorTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE1B3B9C1423111C001460F9 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		CE1B3BA51423111C001460F9 /* GraphCalculatorTests-Info.plist */ = {isa = PBXFileReference; path = "GraphCalculatorTests-Info.plist"; sourceTree = "<group>"; };
+		CE1B3BA71423111C001460F9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		CE1B3BA91423111C001460F9 /* GraphCalculatorTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GraphCalculatorTests.h; sourceTree = "<group>"; };
+		CE1B3BAB1423111C001460F9 /* GraphCalculatorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GraphCalculatorTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CE1B3B7A1423111C001460F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE1B3B821423111C001460F9 /* UIKit.framework in Frameworks */,
+				CE1B3B841423111C001460F9 /* Foundation.framework in Frameworks */,
+				CE1B3B861423111C001460F9 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE1B3B971423111C001460F9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE1B3B9D1423111C001460F9 /* SenTestingKit.framework in Frameworks */,
+				CE1B3B9E1423111C001460F9 /* UIKit.framework in Frameworks */,
+				CE1B3B9F1423111C001460F9 /* Foundation.framework in Frameworks */,
+				CE1B3BA01423111C001460F9 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CE1B3B721423111C001460F9 = {
+			isa = PBXGroup;
+			children = (
+				CE1B3B871423111C001460F9 /* GraphCalculator */,
+				CE1B3BA31423111C001460F9 /* GraphCalculatorTests */,
+				CE1B3B801423111C001460F9 /* Frameworks */,
+				CE1B3B7E1423111C001460F9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CE1B3B7E1423111C001460F9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CE1B3B7D1423111C001460F9 /* GraphCalculator.app */,
+				CE1B3B9B1423111C001460F9 /* GraphCalculatorTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CE1B3B801423111C001460F9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CE1B3B811423111C001460F9 /* UIKit.framework */,
+				CE1B3B831423111C001460F9 /* Foundation.framework */,
+				CE1B3B851423111C001460F9 /* CoreGraphics.framework */,
+				CE1B3B9C1423111C001460F9 /* SenTestingKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CE1B3B871423111C001460F9 /* GraphCalculator */ = {
+			isa = PBXGroup;
+			children = (
+				CE1B3B901423111C001460F9 /* GraphCalculatorAppDelegate.h */,
+				CE1B3B911423111C001460F9 /* GraphCalculatorAppDelegate.m */,
+				CE1B3B931423111C001460F9 /* MainWindow.xib */,
+				CE1B3B881423111C001460F9 /* Supporting Files */,
+			);
+			path = GraphCalculator;
+			sourceTree = "<group>";
+		};
+		CE1B3B881423111C001460F9 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CE1B3B891423111C001460F9 /* GraphCalculator-Info.plist */,
+				CE1B3B8A1423111C001460F9 /* InfoPlist.strings */,
+				CE1B3B8D1423111C001460F9 /* main.m */,
+				CE1B3B8F1423111C001460F9 /* GraphCalculator-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		CE1B3BA31423111C001460F9 /* GraphCalculatorTests */ = {
+			isa = PBXGroup;
+			children = (
+				CE1B3BA91423111C001460F9 /* GraphCalculatorTests.h */,
+				CE1B3BAB1423111C001460F9 /* GraphCalculatorTests.m */,
+				CE1B3BA41423111C001460F9 /* Supporting Files */,
+			);
+			path = GraphCalculatorTests;
+			sourceTree = "<group>";
+		};
+		CE1B3BA41423111C001460F9 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CE1B3BA51423111C001460F9 /* GraphCalculatorTests-Info.plist */,
+				CE1B3BA61423111C001460F9 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CE1B3B7C1423111C001460F9 /* GraphCalculator */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE1B3BAF1423111C001460F9 /* Build configuration list for PBXNativeTarget "GraphCalculator" */;
+			buildPhases = (
+				CE1B3B791423111C001460F9 /* Sources */,
+				CE1B3B7A1423111C001460F9 /* Frameworks */,
+				CE1B3B7B1423111C001460F9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GraphCalculator;
+			productName = GraphCalculator;
+			productReference = CE1B3B7D1423111C001460F9 /* GraphCalculator.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CE1B3B9A1423111C001460F9 /* GraphCalculatorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE1B3BB21423111C001460F9 /* Build configuration list for PBXNativeTarget "GraphCalculatorTests" */;
+			buildPhases = (
+				CE1B3B961423111C001460F9 /* Sources */,
+				CE1B3B971423111C001460F9 /* Frameworks */,
+				CE1B3B981423111C001460F9 /* Resources */,
+				CE1B3B991423111C001460F9 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CE1B3BA21423111C001460F9 /* PBXTargetDependency */,
+			);
+			name = GraphCalculatorTests;
+			productName = GraphCalculatorTests;
+			productReference = CE1B3B9B1423111C001460F9 /* GraphCalculatorTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CE1B3B741423111C001460F9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				ORGANIZATIONNAME = "Rose-Hulman Institute of Technology";
+			};
+			buildConfigurationList = CE1B3B771423111C001460F9 /* Build configuration list for PBXProject "GraphCalculator" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = CE1B3B721423111C001460F9;
+			productRefGroup = CE1B3B7E1423111C001460F9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CE1B3B7C1423111C001460F9 /* GraphCalculator */,
+				CE1B3B9A1423111C001460F9 /* GraphCalculatorTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CE1B3B7B1423111C001460F9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE1B3B8C1423111C001460F9 /* InfoPlist.strings in Resources */,
+				CE1B3B951423111C001460F9 /* MainWindow.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE1B3B981423111C001460F9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE1B3BA81423111C001460F9 /* InfoPlist.strings in Resources */,
+				CE1B3BAA1423111C001460F9 /* GraphCalculatorTests.h in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		CE1B3B991423111C001460F9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CE1B3B791423111C001460F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE1B3B8E1423111C001460F9 /* main.m in Sources */,
+				CE1B3B921423111C001460F9 /* GraphCalculatorAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE1B3B961423111C001460F9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CE1B3BAC1423111C001460F9 /* GraphCalculatorTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CE1B3BA21423111C001460F9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE1B3B7C1423111C001460F9 /* GraphCalculator */;
+			targetProxy = CE1B3BA11423111C001460F9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		CE1B3B8A1423111C001460F9 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE1B3B8B1423111C001460F9 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		CE1B3B931423111C001460F9 /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE1B3B941423111C001460F9 /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		CE1B3BA61423111C001460F9 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CE1B3BA71423111C001460F9 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		CE1B3BAD1423111C001460F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		CE1B3BAE1423111C001460F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CE1B3BB01423111C001460F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "GraphCalculator/GraphCalculator-Prefix.pch";
+				INFOPLIST_FILE = "GraphCalculator/GraphCalculator-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		CE1B3BB11423111C001460F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "GraphCalculator/GraphCalculator-Prefix.pch";
+				INFOPLIST_FILE = "GraphCalculator/GraphCalculator-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		CE1B3BB31423111C001460F9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/GraphCalculator.app/GraphCalculator";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "GraphCalculator/GraphCalculator-Prefix.pch";
+				INFOPLIST_FILE = "GraphCalculatorTests/GraphCalculatorTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		CE1B3BB41423111C001460F9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/GraphCalculator.app/GraphCalculator";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "GraphCalculator/GraphCalculator-Prefix.pch";
+				INFOPLIST_FILE = "GraphCalculatorTests/GraphCalculatorTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CE1B3B771423111C001460F9 /* Build configuration list for PBXProject "GraphCalculator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE1B3BAD1423111C001460F9 /* Debug */,
+				CE1B3BAE1423111C001460F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CE1B3BAF1423111C001460F9 /* Build configuration list for PBXNativeTarget "GraphCalculator" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE1B3BB01423111C001460F9 /* Debug */,
+				CE1B3BB11423111C001460F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		CE1B3BB21423111C001460F9 /* Build configuration list for PBXNativeTarget "GraphCalculatorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE1B3BB31423111C001460F9 /* Debug */,
+				CE1B3BB41423111C001460F9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CE1B3B741423111C001460F9 /* Project object */;
+}
