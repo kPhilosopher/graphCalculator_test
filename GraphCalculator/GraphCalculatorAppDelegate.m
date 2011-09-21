@@ -7,6 +7,7 @@
 //
 
 #import "GraphCalculatorAppDelegate.h"
+#import "CalculatorViewController.h"
 
 @implementation GraphCalculatorAppDelegate
 
@@ -15,6 +16,10 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Override point for customization after application launch.
+	UINavigationController *navigation = [[UINavigationController alloc] init];
+	CalculatorViewController *calculatorView = [[CalculatorViewController alloc] init];
+	[navigation pushViewController:calculatorView animated:NO];
+	[self.window addSubview:navigation.view];
 	[self.window makeKeyAndVisible];
     return YES;
 }
