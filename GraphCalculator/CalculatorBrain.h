@@ -40,6 +40,6 @@
 
 + (id)lastItemInExpression:(id)anExpression;//done
 
-+ (NSString *)stripDownString:(NSString *)stringToStrip;
++ (NSString *)stripDownElement:(NSString *)string;
 
 @end

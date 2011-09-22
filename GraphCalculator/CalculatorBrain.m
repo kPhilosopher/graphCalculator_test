@@ -9,171 +9,195 @@
 #import "CalculatorBrain.h"
 #define VARIABLE_PREFIX @"%"
 
-// Private properties
+#define FUNDAMENTAL_OPERATION 1
+#define VARIABLE 2
+#define NON_FUNDAMENTAL_OPERATION 3
+
+@interface DescriptionOfExpression : NSObject
+{
+	@private
+	NSString *theDescription;
+	id iterationElement;
+}
+- (void)compileDescriptionByIteratingThrough:(NSMutableArray *)anExpression;
+@end
+
+@interface DescriptionOfExpression ()
+@property (nonatomic, copy) NSString *theDescription;
+@property (retain) id iterationElement;
+
+- (void)filterStringElementToEitherVariableOrOperationAndAppendToDescription;
+- (void) filterElementToEitherStringOrNumber;
+- (void) stripDownElementsThatIsVariableOrNonFundamentalOperation;
+- (void) filterFundamentalityAndAppendToDescription;
+- (void)AppendNumberToDescription;
+@end
+
+@implementation DescriptionOfExpression
+@synthesize theDescription, iterationElement;
+
+- (void)compileDescriptionByIteratingThrough:(NSMutableArray *)anExpression
+{
+	for (id element in anExpression)
+	{
+		self.iterationElement = element;
+		[self filterElementToEitherStringOrNumber];
+	}
+}
+
+- (void) filterElementToEitherStringOrNumber
+{
+	if([self.iterationElement isKindOfClass:[NSString class]]) [self filterStringElementToEitherVariableOrOperationAndAppendToDescription];
+	else if([self.iterationElement isKindOfClass:[NSNumber class]])	[self AppendNumberToDescription];
+}
+
+- (void)filterStringElementToEitherVariableOrOperationAndAppendToDescription
+{
+	if(!( ([self.iterationElement length] == FUNDAMENTAL_OPERATION) && ([self.iterationElement isEqualToString:@"="]) ))
+	{
+		[self stripDownElementsThatIsVariableOrNonFundamentalOperation];
+	}
+}
+
+- (void) stripDownElementsThatIsVariableOrNonFundamentalOperation
+{
+	self.iterationElement = [CalculatorBrain stripDownElement:self.iterationElement];
+	[self filterFundamentalityAndAppendToDescription];
+}
+
+- (void) filterFundamentalityAndAppendToDescription
+{
+	if([self.iterationElement length] >= NON_FUNDAMENTAL_OPERATION)		
+		self.theDescription = [[[self.iterationElement stringByAppendingString:@"( "]																		stringByAppendingString:self.theDescription] stringByAppendingString:@") "];
+	else	self.theDescription = [self.theDescription stringByAppendingString:[self.iterationElement stringByAppendingString:@" "]];
+}
+
+- (void) AppendNumberToDescription
+{
+	self.theDescription = [self.theDescription stringByAppendingFormat:@"%g ",[self.iterationElement doubleValue]];
+}
+
+- (NSString *)theDescription
+{
+	if(!theDescription)
+		theDescription = [[NSString alloc] init];
+	return theDescription;
+}
+
+- (void) dealloc
+{
+	self.theDescription = nil;
+	self.iterationElement = nil;
+	[super dealloc];
+}
+
+@end
+
+@interface SolveExpression : NSObject 
+{
+@private
+	//instances
+	double theResult;
+	NSDictionary *variableDictionary;
+	CalculatorBrain *temporaryBrain;
+}
+@property double theResult;
+
+//methods
+-(void) iterateThrough:(NSMutableArray *)theExpression;
+@end
+
+@interface SolveExpression()
+//private methods
+@property (nonatomic, retain) NSDictionary *variableDictionary;
+@property (nonatomic, retain) CalculatorBrain *temporaryBrain;
+//@property (nonatomic, copy) NSString *temporaryOperation;
+
+-(void)determineNumberOrStringByFiltering:(id)element;
+-(void)determineVariableOrOperationByFiltering:(NSString *) string;
+-(void)determineFundamentalityByFiltering:(NSString *) string;
+-(void)setOperandInCalculatorBrainWith:(double) newValue;
+@end
+
+@implementation SolveExpression
+@synthesize theResult, variableDictionary, temporaryBrain;
+
+-(void) iterateThrough:(NSMutableArray *)theExpression
+{
+	for (id element in theExpression)
+		[self determineNumberOrStringByFiltering:element];
+}
+
+-(void)determineNumberOrStringByFiltering:(id)element
+{
+	if([element isKindOfClass:[NSNumber class]])
+		[self setOperandInCalculatorBrainWith:[element doubleValue]];
+	else if([element isKindOfClass:[NSString class]])
+		[self determineVariableOrOperationByFiltering:element];
+}
+
+-(void)determineVariableOrOperationByFiltering:(NSString *) string
+{
+	if([string length] == VARIABLE)
+		[self setOperandInCalculatorBrainWith:[[self.variableDictionary objectForKey:[CalculatorBrain stripDownElement:string]] doubleValue]];
+	else
+		[self determineFundamentalityByFiltering:string];
+}
+
+-(void)determineFundamentalityByFiltering:(NSString *) string
+{
+	if([string length] == FUNDAMENTAL_OPERATION)
+		self.theResult = [self.temporaryBrain performOperation:string];
+	else if([string length] >= NON_FUNDAMENTAL_OPERATION)
+		self.theResult = [self.temporaryBrain performOperation:string];
+}
+
+-(void)setOperandInCalculatorBrainWith:(double) newValue
+{
+	self.temporaryBrain.operand = newValue;
+}
+
+-(CalculatorBrain *)temporaryBrain
+{
+	if (!temporaryBrain)
+		temporaryBrain = [[CalculatorBrain alloc] init];
+	return temporaryBrain;
+}
+
+-(NSDictionary *)variableDictionary
+{
+	if (!variableDictionary)
+		variableDictionary = [[NSDictionary alloc] init];
+	return variableDictionary;
+}
+
+-(void)dealloc
+{
+	self.temporaryBrain = nil;
+	self.variableDictionary = nil;
+	[super dealloc];
+}
+@end
+
 @interface CalculatorBrain()
+
 @property (copy) NSString *waitingOperation;
 @property double waitingOperand;
 @property double memoryOperand;
 @property (retain, nonatomic) NSMutableArray *internalExpression;
+
+
++ (NSString *)checkNonFundamentalOperationFor:(NSString *)thisString;
+
++ (NSMutableSet *)iterateThroughExpression:(NSMutableArray *)anExpression andAddVariablesTo:(NSMutableSet *)set;
+
 @end
 
 @implementation CalculatorBrain
 @synthesize operand, waitingOperand, waitingOperation, memoryOperand, internalExpression;
 
-- (NSMutableArray *)internalExpression
-{
-	if (!internalExpression) {
-		internalExpression = [[NSMutableArray alloc] init];
-	}
-	return internalExpression;
-}
-
-+ (NSString *)checkNonFundamentalOperation:(NSString *) operation
-{
-	if ([operation isEqualToString:@"+/-"])			operation = @"(-)";
-	else if ([operation isEqualToString:@"1/x"])	operation = @"1/";
-	return operation;
-}
-
-+ (NSString *)stripDownString:(NSString *)stringToStrip
-{
-	if([stringToStrip length] == 2)		stringToStrip = [NSString stringWithFormat:@"%c",
-														 [stringToStrip characterAtIndex:([stringToStrip length]-1)]];
-	else if([stringToStrip length] >= 3)	stringToStrip = [self checkNonFundamentalOperation:stringToStrip];
-	return stringToStrip;
-}
-
-//TODO: implement and make sure to deal with division by zero.
-
-+ (double)evaluateExpression:(id)anExpression usingVariableValues:(NSDictionary *)variables
-{
-	double currentValue;
-	
-	if([anExpression isKindOfClass:[NSMutableArray class]])
-	{
-		CalculatorBrain *temporaryBrain = [[CalculatorBrain alloc] init];
-		NSMutableArray *arrayOfExpression = (NSMutableArray *)anExpression;
-		for (id element in arrayOfExpression)
-		{
-			
-			//variables to be manipulated by the controller
-			BOOL elementInThisIterationIsVariableOrNumber = NO;
-			BOOL elementInThisIterationIsOperation = NO;
-			double temporaryOperand;
-			NSString *temporaryOperation;
-			
-			//controller: find out which computations to be performed
-			
-			if([element isKindOfClass:[NSNumber class]])
-			{
-				elementInThisIterationIsVariableOrNumber = YES;
-				temporaryOperand = [element doubleValue];
-			}
-			else if([element isKindOfClass:[NSString class]])
-			{
-				NSString *temporaryString = (NSString *)element;
-				if([temporaryString length] == 2)
-				{
-					elementInThisIterationIsVariableOrNumber = YES;	
-					temporaryString = [CalculatorBrain stripDownString:temporaryString];
-					NSNumber *number = [variables objectForKey:temporaryString];
-					//go through variables dictionary to find the right variable
-					temporaryOperand = [number doubleValue];
-				}
-				else
-				{
-					if([temporaryString length] == 1)
-					{
-						temporaryOperation = temporaryString;
-						elementInThisIterationIsOperation = YES;
-					}
-					else if([temporaryString length] >= 3)
-					{
-						temporaryOperation = temporaryString;
-						elementInThisIterationIsOperation = YES;
-					}
-				}
-			}
-			
-			//computations
-			if(elementInThisIterationIsVariableOrNumber)
-			{
-				temporaryBrain.operand = temporaryOperand;
-			}
-			else if(elementInThisIterationIsOperation)
-			{
-				currentValue = [temporaryBrain performOperation:temporaryOperation];
-			}
-		}
-	}
-	return currentValue;
-}
-
-+ (NSMutableSet *)iterateThroughExpression:(NSMutableArray *)anExpression andAddVariablesTo:(NSMutableSet *)set
-{
-	for (id element in anExpression)
-		if(([element isKindOfClass:[NSString class]]) && ([element length] == 2))	[set addObject:element];
-	if ([set count] == 0) set = nil;
-	return set;
-}
-
-+ (NSSet *)variablesInExpression:(id)anExpression
-{
-	NSMutableSet *set = [NSMutableSet setWithCapacity:3];
-	if([anExpression isKindOfClass:[NSMutableArray class]])		set = [self iterateThroughExpression:anExpression andAddVariablesTo:set];
-	return set;
-}
-
-+ (NSString *)descriptionOfExpression:(id)anExpression
-{	
-	NSString *description = @"";
-	if([anExpression isKindOfClass:[NSMutableArray class]])
-	{
-		NSMutableArray *array = (NSMutableArray *)anExpression;
-		for (id element in array) {
-			//variable or operation
-			if([element isKindOfClass:[NSString class]])
-			{
-				NSString *currentString = (NSString *)element;
-				
-				//when the expression element is +,-,*,/,=
-				if([currentString length] == 1)
-				{
-					if([currentString isEqualToString:@"="])
-					{
-						currentString = @"";
-					}
-					else
-					{
-						description = [description stringByAppendingString:[currentString stringByAppendingString:@" "]];
-					}
-				}
-				else
-				{
-					currentString = [CalculatorBrain stripDownString:currentString];
-					if([currentString length] >= 2)
-					{
-						NSString *front = [currentString stringByAppendingString:@"( "];
-						description = [front stringByAppendingString:description];
-						description = [description stringByAppendingString:@") "];
-					}
-					else
-					{
-						description = [description stringByAppendingString:[currentString stringByAppendingString:@" "]];
-					}
-				}
-			}
-			//when the element is a number
-			else if([element isKindOfClass:[NSNumber class]])
-			{
-				NSNumber *currentString = (NSNumber *)element;
-				description = [description stringByAppendingFormat:@"%g ",[currentString doubleValue]];
-			}
-		}
-	}
-	return description;
-}
-
+////////////////
+//
 + (id)propertyListForExpression:(id)anExpression
 {
 	if([anExpression isMemberOfClass:[NSMutableArray class]])	[anExpression autorelease];
@@ -195,6 +219,12 @@
 	return temp;
 }
 
+- (NSMutableArray *)internalExpression
+{
+	if (!internalExpression)	internalExpression = [[NSMutableArray alloc] init];
+	return internalExpression;
+}
+
 - (id)expression
 {
 	NSMutableArray *temp = [[NSMutableArray alloc] initWithArray:self.internalExpression copyItems:YES];
@@ -208,8 +238,85 @@
 	[self.internalExpression addObject:operation];
 }
 
-// Private method that does the math operation.
+- (void)setVariableAsOperand:(NSString *)variableName
+{
+	//implement
+	NSString *vp = VARIABLE_PREFIX;
+	[self addNumber:nil andOperation:[vp stringByAppendingString:variableName]];
+}
+//
+////////////////
 
+
+////////////////
+//
++ (double)evaluateExpression:(id)anExpression usingVariableValues:(NSDictionary *)variables
+{
+	SolveExpression *solver = [[[SolveExpression alloc] init] autorelease];
+	solver.variableDictionary = variables;
+	if([anExpression isKindOfClass:[NSMutableArray class]])		[solver iterateThrough:anExpression];
+	return solver.theResult;
+}
+//
+////////////////
+
+
+////////////////
+//
++ (NSString *)stripDownElement:(NSString *)string
+{
+	if([string length] == VARIABLE)
+		string = [NSString stringWithFormat:@"%c",[string characterAtIndex:([string length]-1)]];
+	else if([string length] >= NON_FUNDAMENTAL_OPERATION)	string = [CalculatorBrain checkNonFundamentalOperationFor:string];
+	return string;
+}
+
++ (NSString *)checkNonFundamentalOperationFor:(NSString *)thisString
+{
+	if ([thisString isEqualToString:@"+/-"])			thisString = @"(-)";
+	else if ([thisString isEqualToString:@"1/x"])		thisString = @"1 /";
+	return thisString;
+}
+//
+////////////////
+
+
+////////////////
+//
++ (NSSet *)variablesInExpression:(id)anExpression
+{
+	NSMutableSet *set = [NSMutableSet setWithCapacity:3];
+	if([anExpression isKindOfClass:[NSMutableArray class]])		set = [self iterateThroughExpression:anExpression andAddVariablesTo:set];
+	return set;
+}
+
++ (NSMutableSet *)iterateThroughExpression:(NSMutableArray *)anExpression andAddVariablesTo:(NSMutableSet *)set
+{
+	for (id element in anExpression)
+		if(([element isKindOfClass:[NSString class]]) && ([element length] == 2))	[set addObject:element];
+	if ([set count] == 0) set = nil;
+	return set;
+}
+//
+////////////////
+
+
+
+////////////////
+//
++ (NSString *)descriptionOfExpression:(id)anExpression
+{	
+	DescriptionOfExpression *descriptionExpression = [[[DescriptionOfExpression alloc] init] autorelease]; 
+	if([anExpression isKindOfClass:[NSMutableArray class]])
+		[descriptionExpression compileDescriptionByIteratingThrough:anExpression];
+	return descriptionExpression.theDescription;
+}
+//
+////////////////
+
+//need to refactor
+////////////////
+//
 - (double)performWaitingOperation
 {
 	if([@"+" isEqualToString:self.waitingOperation])
@@ -231,9 +338,6 @@
 	}
 	return self.operand;
 }
-
-// Deals with operations related to simple math operations such as
-// +, -, *, /
 
 - (double)performOperation:(NSString *)operation
 {	
@@ -273,10 +377,13 @@
 	}
 	return self.operand;
 }
+//
+////////////////
 
 
-// Deals with operations related to Memory functions such as clear, Mem +, Store
-
+//need to refactor
+////////////////
+//
 - (double)performMemoryOperation:(NSString *)operation toStore:(NSString *)store
 {
 	
@@ -294,16 +401,8 @@
 	}
 	return self.memoryOperand;
 }
-
-//executed when the variable button is pressed in the view
-
-- (void)setVariableAsOperand:(NSString *)variableName
-{
-	//implement
-	NSString *vp = VARIABLE_PREFIX;
-	[self addNumber:nil andOperation:[vp stringByAppendingString:variableName]];
-}
-
+//
+////////////////
 
 - (void) dealloc
 {

@@ -7,9 +7,6 @@
 //
 
 #import "CalculatorViewController.h"
-//#define FUNDAMENTAL_OPERATION 1
-//#define VARIABLE 2
-//#define NON_FUNDAMENTAL_OPERATION 3
 
 @interface CalculatorViewController()
 @property (retain, readonly) CalculatorBrain *brain;
@@ -109,7 +106,7 @@
 	return theVerdict;
 }
 
--(BOOL)checkIfLastElementInExpression:(NSArray *) arrayOfElements
+-(BOOL)checkIfLastElementInExpressionIsIn:(NSArray *) arrayOfElements
 {
 	BOOL theVerdict;
 	BOOL lastOperationIsValid;
@@ -123,7 +120,7 @@
 		stringOrNot = YES;
 		lastOperationIsValid = YES;
 		stringInExpression = (NSString *)lastOperation;
-		stringInExpression = [CalculatorBrain stripDownString:stringInExpression];
+		stringInExpression = [CalculatorBrain stripDownElement:stringInExpression];
 	}
 	else if([lastOperation isKindOfClass:[NSNumber class]])
 	{
@@ -165,7 +162,7 @@
 // executed when a digit is pressed
 - (IBAction)digitPressed:(UIButton *)sender
 {
-	if([self checkIfLastElementInExpression:[NSArray arrayWithObjects:@"+", @"-", @"/", @"*", nil]] ||
+	if([self checkIfLastElementInExpressionIsIn:[NSArray arrayWithObjects:@"+", @"-", @"/", @"*", nil]] ||
 	   (!self.initialBooleanDigit && [self checkIfExpressionIsEmpty]))
 	{
 		NSString *digit = [[sender titleLabel] text];
@@ -267,7 +264,7 @@
 		self.userIsInTheMiddleOfTypingANumber = YES;
 	}
 	//renew the display and set the variable in the model
-	else if([self checkIfLastElementInExpression:[NSArray arrayWithObjects:@"+", @"-", @"*", @"/", nil]] ||
+	else if([self checkIfLastElementInExpressionIsIn:[NSArray arrayWithObjects:@"+", @"-", @"*", @"/", nil]] ||
 			(!self.initialBooleanVariable && [self checkIfExpressionIsEmpty]))
 	{
 		//adding the variable to the expression
