@@ -119,20 +119,19 @@
 @property BOOL userPressedAVariable;
 @property BOOL userIsInTheMiddleOfTypingANumber;
 @property BOOL storedInformation;
+@property (retain) IBOutlet UILabel *display;
 
 @property (copy) NSString *typingNumber;
 
-
+- (void) setUserIsNotTypingAndPeriodReset;
 
 
 @property BOOL periodIsEntered;
-@property BOOL initialBooleanDigit;
-@property BOOL initialBooleanVariable;
 @end
 
 @implementation CalculatorViewController
 @synthesize userPressedAVariable, storedInformation, periodIsEntered, userIsInTheMiddleOfTypingANumber,
-			typingNumber, initialBooleanDigit, initialBooleanVariable;
+			typingNumber, display;
 
 // lazy alloc and init of brain
 // returns brain
@@ -147,60 +146,45 @@
 
 - (BOOL)checkIfVariableIsInExpression{
 	if(!self.userPressedAVariable)
-	{
-		//go through the expression and check if there is a variable.
 		if([CalculatorBrain variablesInExpression:self.brain.expression])	self.userPressedAVariable = YES;
-		else																self.userPressedAVariable = NO;
-	}
 	return self.userPressedAVariable;
 }
 
-- (void) setUserIsNotTypingAndPeriodReset{
-	self.userIsInTheMiddleOfTypingANumber = NO;
-	self.periodIsEntered = NO;
-	self.initialBooleanDigit = YES;
-}
 
-- (IBAction)clear
-{
-	
-	self.userIsInTheMiddleOfTypingANumber = NO;
-	self.periodIsEntered = NO;
-	
-	
-	[display setText:@"0"];
-	[self.brain setOperand:0.0];
-	[self.brain performOperation:@"clear"];
-	[self.brain performMemoryOperation:@"Store" toStore:@"0"];
-	self.typingNumber = nil;
-	self.storedInformation = NO;
-	self.userPressedAVariable = NO;
-	self.initialBooleanDigit = NO;
-	self.initialBooleanVariable = NO;
-}
 
 - (void)changeDisplay:(NSString *)text
 {
 	if([self checkIfVariableIsInExpression])
-	{
-		NSString *expressionDescription = [CalculatorBrain descriptionOfExpression:self.brain.expression];
-		[display setText:expressionDescription];
-	}
-	else
-	{
-		[display setText:text];
-	}
+		text = [CalculatorBrain descriptionOfExpression:self.brain.expression];
+	[display setText:text];
 }
+
+- (IBAction)clear
+{
+	[self setUserIsNotTypingAndPeriodReset];
+	[self.brain clearOperations];
+	self.typingNumber = nil;
+	self.storedInformation = NO;
+	self.userPressedAVariable = NO;
+	[self changeDisplay:@"0"];
+}
+
+- (void) setUserIsNotTypingAndPeriodReset
+{
+	self.userIsInTheMiddleOfTypingANumber = NO;
+	self.periodIsEntered = NO;
+}
+
 
 -(BOOL)checkIfExpressionIsEmpty
 {
-	BOOL theVerdict;
+	BOOL verdict = NO;
 	if([self.brain.expression count] == 0)
-		theVerdict = YES;
-	return theVerdict;
+		verdict = YES;
+	return verdict;
 }
 
--(BOOL)initiateCheckIfLastElementInExpressionCorrespondsWith:(NSArray *) arrayOfCandidates
+-(BOOL)initiateCheckWhetherLastElementInExpressionCorrespondsWith:(NSArray *) arrayOfCandidates
 {	
 	CheckLastItemInExpression *check = 
 	[[[CheckLastItemInExpression alloc] initWithArrayOfCandidates:arrayOfCandidates 
@@ -212,8 +196,7 @@
 // executed when a digit is pressed
 - (IBAction)digitPressed:(UIButton *)sender
 {
-	if([self initiateCheckIfLastElementInExpressionCorrespondsWith:[NSArray arrayWithObjects:@"+", @"-", @"/", @"*", nil]] ||
-	   (!self.initialBooleanDigit && [self checkIfExpressionIsEmpty]))
+	if([self initiateCheckWhetherLastElementInExpressionCorrespondsWith:[NSArray arrayWithObjects:@"+", @"-", @"/", @"*", nil]] ||	([self checkIfExpressionIsEmpty]))
 	{
 		NSString *digit = [[sender titleLabel] text];
 		
@@ -222,38 +205,26 @@
 			if((![self.typingNumber isEqualToString:@"0"]))
 			{
 				// handle when user is entering point again.
-				if( (self.periodIsEntered) && ([digit isEqualToString:@"."]))
-				{
-					//nothing happens
-					self.periodIsEntered = YES;
-				}
-				else
+				if( !((self.periodIsEntered) && ([digit isEqualToString:@"."])))
 				{
 					self.typingNumber = [self.typingNumber stringByAppendingString:digit];
 					[self changeDisplay:self.typingNumber];
 				}
 			}
 		}
-		
-		// when user starts typing a new set of digits
-		
 		else
 		{
 			if([digit isEqualToString:@"."])
 			{
 				self.typingNumber = [@"0" stringByAppendingString:digit];
-				[self changeDisplay:self.typingNumber];
 			}
 			else
 			{
 				self.typingNumber = digit;
-				[self changeDisplay:self.typingNumber];
 			}
+			[self changeDisplay:self.typingNumber];
 			self.userIsInTheMiddleOfTypingANumber = YES;
-		
 		}
-		
-		// Set the period boolean so that there isn't two dots in a number
 		if([digit isEqualToString:@"."])
 		{
 			self.periodIsEntered = YES;
@@ -301,17 +272,11 @@
 		self.userIsInTheMiddleOfTypingANumber = YES;
 	}
 	//renew the display and set the variable in the model
-	else if([self initiateCheckIfLastElementInExpressionCorrespondsWith:[NSArray arrayWithObjects:@"+", @"-", @"*", @"/", nil]] ||
-			(!self.initialBooleanVariable && [self checkIfExpressionIsEmpty]))
+	else if(([self initiateCheckWhetherLastElementInExpressionCorrespondsWith:[NSArray arrayWithObjects:@"+", @"-", @"*", @"/", nil]]) ||	([self checkIfExpressionIsEmpty]))
 	{
-		//adding the variable to the expression
 		NSString *tempString = [[sender titleLabel] text];
 		[self.brain setVariableAsOperand:tempString];
-		
-		//update the display
 		[self changeDisplay:@""];
-		
-		self.initialBooleanVariable = YES;
 	}
 	else
 	{
@@ -330,7 +295,7 @@
 		if([@"Recall" isEqualToString:[[sender titleLabel] text]] && self.storedInformation)
 		{
 			[self setUserIsNotTypingAndPeriodReset];
-			[display setText:[NSString stringWithFormat:@"%g", result]];
+			[self changeDisplay:[NSString stringWithFormat:@"%g", result]];
 		}
 		else if([@"Store" isEqualToString:[[sender titleLabel] text]])
 		{
@@ -357,8 +322,14 @@
 	}
 }
 
+-(void) viewDidUnload
+{
+	self.display = nil;
+}
+
 - (void)dealloc
 {
+	self.display = nil;
 	self.typingNumber = nil;
 	[brain release];
 	[super dealloc];

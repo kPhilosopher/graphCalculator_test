@@ -18,6 +18,7 @@
 	@private
 	NSString *theDescription;
 	id iterationElement;
+	id previousElement;
 }
 - (void)compileDescriptionByIteratingThrough:(NSMutableArray *)anExpression;
 @end
@@ -25,9 +26,10 @@
 @interface DescriptionOfExpression ()
 @property (nonatomic, copy) NSString *theDescription;
 @property (retain) id iterationElement;
+@property (retain) id previousElement;
 
 - (void) filterElementToEitherStringOrNumber;
-- (void) doNothingWithEqualOperationElement;
+- (void) filterWhetherElementIsEqualOperationOrNot;
 - (void) stripDownElementsUsingCalculatorBrainMethod;
 - (void) filterFundamentality;
 - (void) appendNonFundamentalOperation;
@@ -36,7 +38,7 @@
 @end
 
 @implementation DescriptionOfExpression
-@synthesize theDescription, iterationElement;
+@synthesize theDescription, iterationElement, previousElement;
 
 - (void)compileDescriptionByIteratingThrough:(NSMutableArray *)anExpression
 {
@@ -44,21 +46,22 @@
 	{
 		self.iterationElement = element;
 		[self filterElementToEitherStringOrNumber];
+		self.previousElement = element;
 	}
 }
 
 - (void) filterElementToEitherStringOrNumber
 {
-	if([self.iterationElement isKindOfClass:[NSString class]]) [self doNothingWithEqualOperationElement];
+	if([self.iterationElement isKindOfClass:[NSString class]]) [self filterWhetherElementIsEqualOperationOrNot];
 	else if([self.iterationElement isKindOfClass:[NSNumber class]])	[self appendNumberToDescription];
 }
 
-- (void) doNothingWithEqualOperationElement
+- (void) filterWhetherElementIsEqualOperationOrNot
 {
 	if(!([self.iterationElement isEqualToString:@"="]))
-	{
 		[self stripDownElementsUsingCalculatorBrainMethod];
-	}
+//	else
+//		[self ]
 }
 
 - (void) stripDownElementsUsingCalculatorBrainMethod
@@ -82,6 +85,8 @@
 {
 	self.theDescription = [self.theDescription stringByAppendingString:[self.iterationElement stringByAppendingString:@" "]];
 }
+
+//-(void) 
 
 - (void) appendNumberToDescription
 {
@@ -378,12 +383,6 @@
 	{
 		self.operand = cos(self.operand*M_PI/180);
 	}
-	else if([operation isEqualToString:@"clear"])
-	{
-		self.waitingOperand = 0.0;
-		self.waitingOperation = nil;
-		[self.internalExpression removeAllObjects];
-	}
 	else
 	{
 		[self performWaitingOperation];
@@ -395,6 +394,14 @@
 //
 ////////////////
 
+-(void) clearOperations
+{
+	self.operand = 0.0;
+	self.waitingOperand = 0.0;
+	self.waitingOperation = nil;
+	[self.internalExpression removeAllObjects];
+	[self performMemoryOperation:@"Store" toStore:@"0"];
+}
 
 ////////////////
 //

@@ -39,6 +39,7 @@
 - (void)addNumber:(NSString *)number andOperation:(NSString *)operation;//done
 
 + (id)lastItemInExpression:(id)anExpression;//done
+-(void) clearOperations;
 
 + (NSString *)stripDownElement:(NSString *)string;
 

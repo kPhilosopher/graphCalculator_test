@@ -13,9 +13,6 @@
 {
 	@private
 	IBOutlet UILabel *display;
-	IBOutlet UIButton *var1;
-	IBOutlet UIButton *var2;
-	IBOutlet UIButton *var3;
 	CalculatorBrain *brain;
 	NSString *typingNumber;
 	BOOL userIsInTheMiddleOfTypingANumber;
