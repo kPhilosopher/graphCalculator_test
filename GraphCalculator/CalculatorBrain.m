@@ -26,11 +26,13 @@
 @property (nonatomic, copy) NSString *theDescription;
 @property (retain) id iterationElement;
 
-- (void)filterStringElementToEitherVariableOrOperationAndAppendToDescription;
 - (void) filterElementToEitherStringOrNumber;
-- (void) stripDownElementsThatIsVariableOrNonFundamentalOperation;
-- (void) filterFundamentalityAndAppendToDescription;
-- (void)AppendNumberToDescription;
+- (void) doNothingWithEqualOperationElement;
+- (void) stripDownElementsUsingCalculatorBrainMethod;
+- (void) filterFundamentality;
+- (void) appendNonFundamentalOperation;
+- (void) appendVariableOrFundamentalOperation;
+- (void) appendNumberToDescription;
 @end
 
 @implementation DescriptionOfExpression
@@ -47,32 +49,41 @@
 
 - (void) filterElementToEitherStringOrNumber
 {
-	if([self.iterationElement isKindOfClass:[NSString class]]) [self filterStringElementToEitherVariableOrOperationAndAppendToDescription];
-	else if([self.iterationElement isKindOfClass:[NSNumber class]])	[self AppendNumberToDescription];
+	if([self.iterationElement isKindOfClass:[NSString class]]) [self doNothingWithEqualOperationElement];
+	else if([self.iterationElement isKindOfClass:[NSNumber class]])	[self appendNumberToDescription];
 }
 
-- (void)filterStringElementToEitherVariableOrOperationAndAppendToDescription
+- (void) doNothingWithEqualOperationElement
 {
-	if(!( ([self.iterationElement length] == FUNDAMENTAL_OPERATION) && ([self.iterationElement isEqualToString:@"="]) ))
+	if(!([self.iterationElement isEqualToString:@"="]))
 	{
-		[self stripDownElementsThatIsVariableOrNonFundamentalOperation];
+		[self stripDownElementsUsingCalculatorBrainMethod];
 	}
 }
 
-- (void) stripDownElementsThatIsVariableOrNonFundamentalOperation
+- (void) stripDownElementsUsingCalculatorBrainMethod
 {
 	self.iterationElement = [CalculatorBrain stripDownElement:self.iterationElement];
-	[self filterFundamentalityAndAppendToDescription];
+	[self filterFundamentality];
 }
 
-- (void) filterFundamentalityAndAppendToDescription
+- (void) filterFundamentality
 {
-	if([self.iterationElement length] >= NON_FUNDAMENTAL_OPERATION)		
-		self.theDescription = [[[self.iterationElement stringByAppendingString:@"( "]																		stringByAppendingString:self.theDescription] stringByAppendingString:@") "];
-	else	self.theDescription = [self.theDescription stringByAppendingString:[self.iterationElement stringByAppendingString:@" "]];
+	if([self.iterationElement length] >= NON_FUNDAMENTAL_OPERATION)		[self appendNonFundamentalOperation];
+	else																[self appendVariableOrFundamentalOperation];
 }
 
-- (void) AppendNumberToDescription
+- (void) appendNonFundamentalOperation
+{
+	self.theDescription = [[[self.iterationElement stringByAppendingString:@"( "]																		stringByAppendingString:self.theDescription] stringByAppendingString:@") "];
+}
+
+- (void) appendVariableOrFundamentalOperation
+{
+	self.theDescription = [self.theDescription stringByAppendingString:[self.iterationElement stringByAppendingString:@" "]];
+}
+
+- (void) appendNumberToDescription
 {
 	self.theDescription = [self.theDescription stringByAppendingFormat:@"%g ",[self.iterationElement doubleValue]];
 }
@@ -100,6 +111,7 @@
 	double theResult;
 	NSDictionary *variableDictionary;
 	CalculatorBrain *temporaryBrain;
+	id iterationElement;
 }
 @property double theResult;
 
@@ -111,51 +123,55 @@
 //private methods
 @property (nonatomic, retain) NSDictionary *variableDictionary;
 @property (nonatomic, retain) CalculatorBrain *temporaryBrain;
-//@property (nonatomic, copy) NSString *temporaryOperation;
+@property (retain) id iterationElement;
 
--(void)determineNumberOrStringByFiltering:(id)element;
--(void)determineVariableOrOperationByFiltering:(NSString *) string;
--(void)determineFundamentalityByFiltering:(NSString *) string;
--(void)setOperandInCalculatorBrainWith:(double) newValue;
+-(void) filterElementToStringOrNumber;
+-(void) filterStringToOperationOrVariable;
+-(void) peformOperationAndSetResult;
+-(void) setOperandInCalculatorBrainToElement;
+-(void) setOperandInCalculatorBrainAsVariableValue;
 @end
 
 @implementation SolveExpression
-@synthesize theResult, variableDictionary, temporaryBrain;
+@synthesize theResult, variableDictionary, temporaryBrain, iterationElement;
 
 -(void) iterateThrough:(NSMutableArray *)theExpression
 {
 	for (id element in theExpression)
-		[self determineNumberOrStringByFiltering:element];
+	{
+		self.iterationElement = element;
+		[self filterElementToStringOrNumber];
+	}
 }
 
--(void)determineNumberOrStringByFiltering:(id)element
+-(void) filterElementToStringOrNumber
 {
-	if([element isKindOfClass:[NSNumber class]])
-		[self setOperandInCalculatorBrainWith:[element doubleValue]];
-	else if([element isKindOfClass:[NSString class]])
-		[self determineVariableOrOperationByFiltering:element];
+	if([self.iterationElement isKindOfClass:[NSNumber class]])		[self setOperandInCalculatorBrainToElement];
+	else if([self.iterationElement isKindOfClass:[NSString class]])		[self filterStringToOperationOrVariable];
 }
 
--(void)determineVariableOrOperationByFiltering:(NSString *) string
+-(void) filterStringToOperationOrVariable
 {
-	if([string length] == VARIABLE)
-		[self setOperandInCalculatorBrainWith:[[self.variableDictionary objectForKey:[CalculatorBrain stripDownElement:string]] doubleValue]];
-	else
-		[self determineFundamentalityByFiltering:string];
+	if([self.iterationElement length] == VARIABLE)	[self setOperandInCalculatorBrainAsVariableValue];
+	else											[self peformOperationAndSetResult];
 }
 
--(void)determineFundamentalityByFiltering:(NSString *) string
+-(void) peformOperationAndSetResult
 {
-	if([string length] == FUNDAMENTAL_OPERATION)
-		self.theResult = [self.temporaryBrain performOperation:string];
-	else if([string length] >= NON_FUNDAMENTAL_OPERATION)
-		self.theResult = [self.temporaryBrain performOperation:string];
+	self.theResult = [self.temporaryBrain performOperation:self.iterationElement];
 }
 
--(void)setOperandInCalculatorBrainWith:(double) newValue
+-(void) setOperandInCalculatorBrainToElement
 {
-	self.temporaryBrain.operand = newValue;
+	self.temporaryBrain.operand = [self.iterationElement doubleValue];
 }
+
+-(void) setOperandInCalculatorBrainAsVariableValue
+{
+	self.temporaryBrain.operand = [[self.variableDictionary objectForKey:[CalculatorBrain stripDownElement:self.iterationElement]]
+								   doubleValue];
+}
+
 
 -(CalculatorBrain *)temporaryBrain
 {
@@ -175,6 +191,7 @@
 {
 	self.temporaryBrain = nil;
 	self.variableDictionary = nil;
+	self.iterationElement = nil;
 	[super dealloc];
 }
 @end
@@ -186,9 +203,7 @@
 @property double memoryOperand;
 @property (retain, nonatomic) NSMutableArray *internalExpression;
 
-
 + (NSString *)checkNonFundamentalOperationFor:(NSString *)thisString;
-
 + (NSMutableSet *)iterateThroughExpression:(NSMutableArray *)anExpression andAddVariablesTo:(NSMutableSet *)set;
 
 @end
@@ -314,7 +329,7 @@
 //
 ////////////////
 
-//need to refactor
+
 ////////////////
 //
 - (double)performWaitingOperation
@@ -381,7 +396,6 @@
 ////////////////
 
 
-//need to refactor
 ////////////////
 //
 - (double)performMemoryOperation:(NSString *)operation toStore:(NSString *)store
@@ -395,10 +409,6 @@
 	{
 		self.memoryOperand += [store doubleValue];
 	}
-	else if([@"clear" isEqualToString:operation])
-	{
-		self.memoryOperand = [store doubleValue];
-	}
 	return self.memoryOperand;
 }
 //
@@ -406,8 +416,8 @@
 
 - (void) dealloc
 {
-	[internalExpression release];
-	[waitingOperation release];
+	self.internalExpression = nil;
+	self.waitingOperation = nil;
 	[super dealloc];
 }
 

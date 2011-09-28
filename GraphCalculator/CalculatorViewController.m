@@ -7,22 +7,132 @@
 //
 
 #import "CalculatorViewController.h"
+#define FUNDAMENTAL_OPERATION 1
+#define VARIABLE 2
+#define NON_FUNDAMENTAL_OPERATION 3
+
+@interface CheckLastItemInExpression : NSObject 
+{
+@private
+    NSArray *arrayOfCandidates;
+	id lastElement;
+	BOOL theVerdict;
+}
+-(id)initWithArrayOfCandidates:(NSArray *) array andLastElement:(id) tempLastElement;
+-(void) determineWhetherLastElementInExpressionIsStringOrNumber;
+@end
+
+@interface CheckLastItemInExpression()
+@property (nonatomic,retain) NSArray *arrayOfCandidates;
+@property (retain) id lastElement;
+@property BOOL theVerdict;
+
+-(void) checkIfTheLastElementIsVariable;
+-(void) stripTheVariable;
+-(void) iterateThroughArrayOfCandidatesToFindIfTheLastElementMatch;
+-(void) determineEqualityOf_NSStringClass_AndKindOfClassOfTheFollowing:(id) element;
+-(void) determineEqualityOfStringAndTheFollowing:(NSString *)string;
+
+-(void) iterateThroughArrayOfCandidatesToFindIfTheLastElementIsNumber;
+-(void) determineEqualityOf_NSNumberClass_AndKindOfClassOfTheFollowing:(id) element;
+
+@end
+
+@implementation CheckLastItemInExpression
+@synthesize arrayOfCandidates, lastElement, theVerdict;
+
+-(id)initWithArrayOfCandidates:(NSArray *) array andLastElement:(id) tempLastElement
+{
+	[super init];
+	self.arrayOfCandidates = array;
+	self.lastElement = tempLastElement;
+	return self;
+}
+
+-(void) determineWhetherLastElementInExpressionIsStringOrNumber
+{
+	if([self.lastElement isKindOfClass:[NSString class]])
+		[self checkIfTheLastElementIsVariable];
+	else if([self.lastElement isKindOfClass:[NSNumber class]])
+		[self iterateThroughArrayOfCandidatesToFindIfTheLastElementIsNumber];
+}
+
+-(void) checkIfTheLastElementIsVariable
+{
+	if ([self.lastElement length] == VARIABLE) 
+		[self stripTheVariable];
+	[self iterateThroughArrayOfCandidatesToFindIfTheLastElementMatch];
+}
+
+-(void) stripTheVariable
+{
+	self.lastElement = [CalculatorBrain stripDownElement:self.lastElement];
+}
+
+-(void) iterateThroughArrayOfCandidatesToFindIfTheLastElementMatch
+{
+	for (id element in self.arrayOfCandidates)
+		[self determineEqualityOf_NSStringClass_AndKindOfClassOfTheFollowing:element];
+}
+
+-(void) determineEqualityOf_NSStringClass_AndKindOfClassOfTheFollowing:(id) element
+{
+	if([element isKindOfClass:[NSString class]])
+		[self determineEqualityOfStringAndTheFollowing:element];
+}
+
+-(void) determineEqualityOfStringAndTheFollowing:(NSString *)string
+{
+	if([string isEqualToString:self.lastElement])
+		self.theVerdict = YES;
+}
+
+-(void) iterateThroughArrayOfCandidatesToFindIfTheLastElementIsNumber
+{
+	for (id element in self.arrayOfCandidates)
+		[self determineEqualityOf_NSNumberClass_AndKindOfClassOfTheFollowing:element];
+}
+
+-(void) determineEqualityOf_NSNumberClass_AndKindOfClassOfTheFollowing:(id) element
+{
+	if([element isKindOfClass:[NSNumber class]])
+		self.theVerdict = YES;
+}
+
+-(NSArray *) arrayOfCandidates
+{
+	if (!arrayOfCandidates)
+		arrayOfCandidates = [[NSArray alloc] init];
+	return arrayOfCandidates;
+}
+
+-(void) dealloc
+{
+	self.arrayOfCandidates = nil;
+	[super dealloc];
+}
+@end
+
 
 @interface CalculatorViewController()
 @property (retain, readonly) CalculatorBrain *brain;
 @property BOOL userPressedAVariable;
 @property BOOL userIsInTheMiddleOfTypingANumber;
-@property BOOL solvePressed;
 @property BOOL storedInformation;
+
+@property (copy) NSString *typingNumber;
+
+
+
+
 @property BOOL periodIsEntered;
 @property BOOL initialBooleanDigit;
 @property BOOL initialBooleanVariable;
-@property (copy) NSString *typingNumber;
 @end
 
 @implementation CalculatorViewController
 @synthesize userPressedAVariable, storedInformation, periodIsEntered, userIsInTheMiddleOfTypingANumber,
-			typingNumber, solvePressed, initialBooleanDigit, initialBooleanVariable;
+			typingNumber, initialBooleanDigit, initialBooleanVariable;
 
 // lazy alloc and init of brain
 // returns brain
@@ -35,32 +145,15 @@
 	return brain;
 }
 
-//returns the tags of the variables
-
-- (NSArray *) variables{
-	NSString *variable1 = [[var1 titleLabel] text];
-	NSString *variable2 = [[var2 titleLabel] text];
-	NSString *variable3 = [[var3 titleLabel] text];
-	return [NSArray arrayWithObjects:variable1, variable2, variable3, nil];
-}
-
 - (BOOL)checkIfVariableIsInExpression{
 	if(!self.userPressedAVariable)
 	{
 		//go through the expression and check if there is a variable.
-		if([CalculatorBrain variablesInExpression:self.brain.expression])
-		{
-			self.userPressedAVariable = YES;
-		}
-		else
-		{
-			self.userPressedAVariable = NO;
-		}
+		if([CalculatorBrain variablesInExpression:self.brain.expression])	self.userPressedAVariable = YES;
+		else																self.userPressedAVariable = NO;
 	}
 	return self.userPressedAVariable;
 }
-
-//private method that will take care of both userIsInTheMiddleOFTypingANumber and period
 
 - (void) setUserIsNotTypingAndPeriodReset{
 	self.userIsInTheMiddleOfTypingANumber = NO;
@@ -70,14 +163,17 @@
 
 - (IBAction)clear
 {
+	
+	self.userIsInTheMiddleOfTypingANumber = NO;
+	self.periodIsEntered = NO;
+	
+	
 	[display setText:@"0"];
 	[self.brain setOperand:0.0];
 	[self.brain performOperation:@"clear"];
-	[self.brain performMemoryOperation:@"clear" toStore:@"0"];
+	[self.brain performMemoryOperation:@"Store" toStore:@"0"];
 	self.typingNumber = nil;
 	self.storedInformation = NO;
-	self.userIsInTheMiddleOfTypingANumber = NO;
-	self.periodIsEntered = NO;
 	self.userPressedAVariable = NO;
 	self.initialBooleanDigit = NO;
 	self.initialBooleanVariable = NO;
@@ -100,69 +196,23 @@
 {
 	BOOL theVerdict;
 	if([self.brain.expression count] == 0)
-	{
 		theVerdict = YES;
-	}
 	return theVerdict;
 }
 
--(BOOL)checkIfLastElementInExpressionIsIn:(NSArray *) arrayOfElements
-{
-	BOOL theVerdict;
-	BOOL lastOperationIsValid;
-	BOOL stringOrNot;
-	NSString *stringInExpression;
-	id lastOperation = [CalculatorBrain lastItemInExpression:self.brain.expression];
-	
-	
-	if([lastOperation isKindOfClass:[NSString class]])
-	{
-		stringOrNot = YES;
-		lastOperationIsValid = YES;
-		stringInExpression = (NSString *)lastOperation;
-		stringInExpression = [CalculatorBrain stripDownElement:stringInExpression];
-	}
-	else if([lastOperation isKindOfClass:[NSNumber class]])
-	{
-		stringOrNot = NO;
-		lastOperationIsValid = YES;
-	}
-	
-	if(lastOperationIsValid)
-	{
-		for (id element in arrayOfElements)
-		{
-			if([element isKindOfClass:[NSString class]] && stringOrNot)
-			{
-				NSString *string = (NSString *)element;
-				if([string isEqualToString:stringInExpression])
-				{
-					theVerdict = YES;
-				}
-			}
-			if([element isKindOfClass:[NSNumber class]] && !stringOrNot)
-			{
-				theVerdict = YES;
-			}
-		}
-	}
-	else
-	{
-		if(!([self.brain.expression count] == 0))
-			NSLog(@"expression has error. from checkIfLastElementInExpression");
-	}
-	return theVerdict;
+-(BOOL)initiateCheckIfLastElementInExpressionCorrespondsWith:(NSArray *) arrayOfCandidates
+{	
+	CheckLastItemInExpression *check = 
+	[[[CheckLastItemInExpression alloc] initWithArrayOfCandidates:arrayOfCandidates 
+												   andLastElement:[CalculatorBrain lastItemInExpression:self.brain.expression]] autorelease];
+	[check determineWhetherLastElementInExpressionIsStringOrNumber];
+	return check.theVerdict;
 }
-
-//-(BOOL)checkLengthOfLastElementInExpression:(int) theLength
-//{
-//	
-//}
 
 // executed when a digit is pressed
 - (IBAction)digitPressed:(UIButton *)sender
 {
-	if([self checkIfLastElementInExpressionIsIn:[NSArray arrayWithObjects:@"+", @"-", @"/", @"*", nil]] ||
+	if([self initiateCheckIfLastElementInExpressionCorrespondsWith:[NSArray arrayWithObjects:@"+", @"-", @"/", @"*", nil]] ||
 	   (!self.initialBooleanDigit && [self checkIfExpressionIsEmpty]))
 	{
 		NSString *digit = [[sender titleLabel] text];
@@ -170,7 +220,7 @@
 		if(self.userIsInTheMiddleOfTypingANumber)
 		{
 			if((![self.typingNumber isEqualToString:@"0"]))
-				{
+			{
 				// handle when user is entering point again.
 				if( (self.periodIsEntered) && ([digit isEqualToString:@"."]))
 				{
@@ -209,19 +259,7 @@
 			self.periodIsEntered = YES;
 		}
 	}
-//    NSDictionary *values = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:32.3],@"x",
-//							[NSNumber numberWithFloat:2.2],@"a",
-//							[NSNumber numberWithFloat:-3.3],@"b",nil];
-//	id returnedValue = [values objectForKey:@"a"];
-//	if([returnedValue isKindOfClass:[NSNumber class]])
-//	{
-//		NSNumber *nsnumber = (NSNumber *)returnedValue;
-//		NSString *stringerrr = [nsnumber description];
-//		NSLog(stringerrr);
-//	}
-
 }
-
 
 // executed when an operation is pressed
 
@@ -255,7 +293,6 @@
 	}
 }
 
-
 -(IBAction)variableButton:(UIButton *)sender
 {
 	
@@ -264,7 +301,7 @@
 		self.userIsInTheMiddleOfTypingANumber = YES;
 	}
 	//renew the display and set the variable in the model
-	else if([self checkIfLastElementInExpressionIsIn:[NSArray arrayWithObjects:@"+", @"-", @"*", @"/", nil]] ||
+	else if([self initiateCheckIfLastElementInExpressionCorrespondsWith:[NSArray arrayWithObjects:@"+", @"-", @"*", @"/", nil]] ||
 			(!self.initialBooleanVariable && [self checkIfExpressionIsEmpty]))
 	{
 		//adding the variable to the expression
@@ -293,7 +330,7 @@
 		if([@"Recall" isEqualToString:[[sender titleLabel] text]] && self.storedInformation)
 		{
 			[self setUserIsNotTypingAndPeriodReset];
-			[display setText:[NSString stringWithFormat:@"%g", result]];//setting display here
+			[display setText:[NSString stringWithFormat:@"%g", result]];
 		}
 		else if([@"Store" isEqualToString:[[sender titleLabel] text]])
 		{
@@ -322,7 +359,7 @@
 
 - (void)dealloc
 {
-	[typingNumber release];
+	self.typingNumber = nil;
 	[brain release];
 	[super dealloc];
 }
