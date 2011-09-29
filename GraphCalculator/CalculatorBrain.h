@@ -36,7 +36,7 @@
 + (NSString *)descriptionOfExpression:(id)anExpression;//done
 + (id)propertyListForExpression:(id)anExpression;//done
 + (id)expressionForPropertyList:(id)propertyList;//done
-- (void)addNumber:(NSString *)number andOperation:(NSString *)operation;//done
+- (void)toExpression_Add:(NSString *)number andAlsoAdd:(NSString *)operation;//done
 
 + (id)lastItemInExpression:(id)anExpression;//done
 -(void) clearOperations;

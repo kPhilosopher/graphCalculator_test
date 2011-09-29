@@ -113,44 +113,76 @@
 }
 @end
 
-
 @interface CalculatorViewController()
+
 @property (retain, readonly) CalculatorBrain *brain;
 @property BOOL userPressedAVariable;
 @property BOOL userIsInTheMiddleOfTypingANumber;
 @property BOOL storedInformation;
-@property (retain) IBOutlet UILabel *display;
+@property BOOL periodIsEntered;
 
 @property (copy) NSString *typingNumber;
+@property (retain) IBOutlet UILabel *display;
+@property (nonatomic,retain) NSArray *fundamentalOperations;
+@property (nonatomic,retain) NSDictionary *variableValues;
 
-- (void) setUserIsNotTypingAndPeriodReset;
+- (void) checkIfExpressionHasVariable;
+- (void) setUserPressedAVariableAsYes;
+- (void) setAsUserIsNotTypingAndResetPeriodBoolean;
 
-
-@property BOOL periodIsEntered;
+//Digit
+- (void) checkIfUserIsInTheMiddleOfTypingANumberAndSendDownTheFollowing:(NSString *) digit;
+- (void) checkToStopIfTheCurrentTypingNumberIsEqualToZeroAndSendDownTheFollowing:(NSString *) digit;
+- (void) checkToStopIfAPeriodIsBeingEnteredTwice:(NSString *) digit;
+- (void) isPeriod_AppendToZeroIfTheFollowing:(NSString *) digit;
+- (void) setTheCurrentTypingNumberTo:(NSString *) digit;
+- (void) setBooleanToNotifyThatUserIsInTheMiddleOfTypingNumber;
+- (void) period_DetermineIfTheFollowing:(NSString *)digit;
+//Operation
+- (void) checkWhetherUserIsInTheMiddleOfTypingNumberOrNotTypingNumberWhileExpressionIsNotEmptyAndPassDown:(NSString *)operation;
+- (void) checkIfVariableIsNotInExpressionForOperation;
+- (void) setOperandInBrainToTheNumericValueOfTypingNumber;
+- (void) checkIfVariableIsInExpressionToDetermineDisplayOptionsAndPassDown:(NSString *)operation;
+//Memory
+- (void) checkIfVariableIsnotInExpressionForMemoryAndPassDown:(UIButton *)sender;
+- (void) performMemoryOperationWith:(UIButton *)sender;
+- (void) checkIf_Recall_IsEqualTo:(UIButton *)sender andPassDown:(double) result;
+- (void) checkIf_Store_IsEqualTo:(UIButton *)sender;
+//Solve
+- (void) checkToMakeSureExpressionIsNotEmpty;
+- (void) checkToMakeSureVariableIsInExpression;
+- (void) callToSolveInCalculatorBrainAndDisplay;
 @end
 
 @implementation CalculatorViewController
-@synthesize userPressedAVariable, storedInformation, periodIsEntered, userIsInTheMiddleOfTypingANumber,
-			typingNumber, display;
-
-// lazy alloc and init of brain
-// returns brain
+@synthesize userIsInTheMiddleOfTypingANumber, userPressedAVariable, storedInformation, periodIsEntered;
+@synthesize typingNumber, display, fundamentalOperations, variableValues;
 
 - (CalculatorBrain *)brain{
 	if(!brain)
-	{
 		brain = [[CalculatorBrain alloc] init];
-	}
 	return brain;
 }
 
+////////////////
+//
 - (BOOL)checkIfVariableIsInExpression{
 	if(!self.userPressedAVariable)
-		if([CalculatorBrain variablesInExpression:self.brain.expression])	self.userPressedAVariable = YES;
+		[self checkIfExpressionHasVariable];
 	return self.userPressedAVariable;
 }
+- (void) checkIfExpressionHasVariable
+{
+	if([CalculatorBrain variablesInExpression:self.brain.expression])
+		[self setUserPressedAVariableAsYes];
+}
 
-
+-(void) setUserPressedAVariableAsYes
+{
+	self.userPressedAVariable = YES;
+}
+//
+////////////////
 
 - (void)changeDisplay:(NSString *)text
 {
@@ -161,7 +193,7 @@
 
 - (IBAction)clear
 {
-	[self setUserIsNotTypingAndPeriodReset];
+	[self setAsUserIsNotTypingAndResetPeriodBoolean];
 	[self.brain clearOperations];
 	self.typingNumber = nil;
 	self.storedInformation = NO;
@@ -169,19 +201,10 @@
 	[self changeDisplay:@"0"];
 }
 
-- (void) setUserIsNotTypingAndPeriodReset
+- (void) setAsUserIsNotTypingAndResetPeriodBoolean
 {
 	self.userIsInTheMiddleOfTypingANumber = NO;
 	self.periodIsEntered = NO;
-}
-
-
--(BOOL)checkIfExpressionIsEmpty
-{
-	BOOL verdict = NO;
-	if([self.brain.expression count] == 0)
-		verdict = YES;
-	return verdict;
 }
 
 -(BOOL)initiateCheckWhetherLastElementInExpressionCorrespondsWith:(NSArray *) arrayOfCandidates
@@ -193,133 +216,204 @@
 	return check.theVerdict;
 }
 
-// executed when a digit is pressed
+-(BOOL)checkIfExpressionIsEmpty
+{
+	BOOL verdict = NO;
+	if([self.brain.expression count] == 0)
+		verdict = YES;
+	return verdict;
+}
+
+
+////////////////
+//
 - (IBAction)digitPressed:(UIButton *)sender
 {
-	if([self initiateCheckWhetherLastElementInExpressionCorrespondsWith:[NSArray arrayWithObjects:@"+", @"-", @"/", @"*", nil]] ||	([self checkIfExpressionIsEmpty]))
+	if([self initiateCheckWhetherLastElementInExpressionCorrespondsWith:self.fundamentalOperations] ||	([self checkIfExpressionIsEmpty]))
 	{
 		NSString *digit = [[sender titleLabel] text];
-		
-		if(self.userIsInTheMiddleOfTypingANumber)
-		{
-			if((![self.typingNumber isEqualToString:@"0"]))
-			{
-				// handle when user is entering point again.
-				if( !((self.periodIsEntered) && ([digit isEqualToString:@"."])))
-				{
-					self.typingNumber = [self.typingNumber stringByAppendingString:digit];
-					[self changeDisplay:self.typingNumber];
-				}
-			}
-		}
-		else
-		{
-			if([digit isEqualToString:@"."])
-			{
-				self.typingNumber = [@"0" stringByAppendingString:digit];
-			}
-			else
-			{
-				self.typingNumber = digit;
-			}
-			[self changeDisplay:self.typingNumber];
-			self.userIsInTheMiddleOfTypingANumber = YES;
-		}
-		if([digit isEqualToString:@"."])
-		{
-			self.periodIsEntered = YES;
-		}
+		[self checkIfUserIsInTheMiddleOfTypingANumberAndSendDownTheFollowing:digit];
 	}
 }
 
-// executed when an operation is pressed
+- (void) checkIfUserIsInTheMiddleOfTypingANumberAndSendDownTheFollowing:(NSString *) digit
+{
+	if(self.userIsInTheMiddleOfTypingANumber)
+		[self checkToStopIfTheCurrentTypingNumberIsEqualToZeroAndSendDownTheFollowing:digit];
+	else
+		[self isPeriod_AppendToZeroIfTheFollowing:digit];
+	[self period_DetermineIfTheFollowing:digit];
 
+}
+- (void) checkToStopIfTheCurrentTypingNumberIsEqualToZeroAndSendDownTheFollowing:(NSString *) digit
+{
+	if(![self.typingNumber isEqualToString:@"0"])
+		[self checkToStopIfAPeriodIsBeingEnteredTwice:digit];
+}
+- (void) checkToStopIfAPeriodIsBeingEnteredTwice:(NSString *) digit
+{
+	if( !((self.periodIsEntered) && ([digit isEqualToString:@"."])))
+	{
+		[self setTheCurrentTypingNumberTo:[self.typingNumber stringByAppendingString:digit]];
+		[self changeDisplay:self.typingNumber];
+	}
+}
+
+- (void) isPeriod_AppendToZeroIfTheFollowing:(NSString *) digit
+{
+	if([digit isEqualToString:@"."])	digit = [@"0" stringByAppendingString:digit];
+	[self setTheCurrentTypingNumberTo:digit];
+	[self changeDisplay:self.typingNumber];
+	[self setBooleanToNotifyThatUserIsInTheMiddleOfTypingNumber];
+}
+
+- (void) setTheCurrentTypingNumberTo:(NSString *) digit
+{
+	self.typingNumber = digit;
+}	
+		 
+- (void) setBooleanToNotifyThatUserIsInTheMiddleOfTypingNumber
+{
+	self.userIsInTheMiddleOfTypingANumber = YES;
+}
+
+- (void) period_DetermineIfTheFollowing:(NSString *)digit
+{
+	if([digit isEqualToString:@"."])
+		self.periodIsEntered = YES;
+}
+//
+////////////////
+
+////////////////
+//
 - (IBAction)operationPressed:(UIButton *)sender
 {
-	
 	NSString *operation = [[sender titleLabel] text];
+	[self checkWhetherUserIsInTheMiddleOfTypingNumberOrNotTypingNumberWhileExpressionIsNotEmptyAndPassDown:operation];
+	[self checkIfVariableIsInExpressionToDetermineDisplayOptionsAndPassDown:operation];
+}
 
+- (void) checkWhetherUserIsInTheMiddleOfTypingNumberOrNotTypingNumberWhileExpressionIsNotEmptyAndPassDown:(NSString *)operation
+{
 	if(self.userIsInTheMiddleOfTypingANumber)
 	{
-		if(![self checkIfVariableIsInExpression])
-		{
-			self.brain.operand = [self.typingNumber doubleValue];
-		}
-		[self.brain addNumber:self.typingNumber andOperation:operation];
-		[self setUserIsNotTypingAndPeriodReset];
+		[self checkIfVariableIsNotInExpressionForOperation];
+		[self.brain toExpression_Add:self.typingNumber andAlsoAdd:operation];
+		[self setAsUserIsNotTypingAndResetPeriodBoolean];
 	}
 	else if(![self checkIfExpressionIsEmpty])
+		[self.brain toExpression_Add:nil andAlsoAdd:operation];
+}
+
+- (void) checkIfVariableIsNotInExpressionForOperation
+{
+	if(![self checkIfVariableIsInExpression])
+		[self setOperandInBrainToTheNumericValueOfTypingNumber];
+}
+
+- (void) setOperandInBrainToTheNumericValueOfTypingNumber
+{
+	self.brain.operand = [self.typingNumber doubleValue];
+}
+
+- (void) checkIfVariableIsInExpressionToDetermineDisplayOptionsAndPassDown:(NSString *)operation
+{
+	if([self checkIfVariableIsInExpression])		[self changeDisplay:@""];
+	else	[self changeDisplay:[NSString stringWithFormat:@"%g", [self.brain performOperation:operation]]];
+}
+//
+////////////////
+
+
+////////////////
+//
+-(IBAction)variableButton:(UIButton *)sender
+{	
+	if(!self.userIsInTheMiddleOfTypingANumber && 
+	   (([self initiateCheckWhetherLastElementInExpressionCorrespondsWith:self.fundamentalOperations]) ||  ([self checkIfExpressionIsEmpty])))
 	{
-		[self.brain addNumber:nil andOperation:operation];
-	}
-	
-	if([self checkIfVariableIsInExpression])
-	{	
+		[self.brain setVariableAsOperand:[[sender titleLabel] text]];
 		[self changeDisplay:@""];
 	}
-	else
+}
+//
+////////////////
+
+
+////////////////
+//
+- (IBAction)memoryRelatedButtonIsPressed:(UIButton *)sender
+{	
+	[self checkIfVariableIsnotInExpressionForMemoryAndPassDown:sender];
+}
+- (void) checkIfVariableIsnotInExpressionForMemoryAndPassDown:(UIButton *)sender
+{
+	if(![self checkIfVariableIsInExpression])
+		[self performMemoryOperationWith:sender];
+}
+- (void) performMemoryOperationWith:(UIButton *)sender
+{
+	double result = [self.brain performMemoryOperation:[[sender titleLabel] text] toStore:[display text]];
+	
+	[self checkIf_Recall_IsEqualTo:sender andPassDown:result];
+	[self checkIf_Store_IsEqualTo:sender];
+	
+}
+- (void) checkIf_Recall_IsEqualTo:(UIButton *)sender andPassDown:(double) result
+{
+	if([@"Recall" isEqualToString:[[sender titleLabel] text]] && self.storedInformation)
 	{
-		double result = [self.brain performOperation:operation];
+		[self setAsUserIsNotTypingAndResetPeriodBoolean];
 		[self changeDisplay:[NSString stringWithFormat:@"%g", result]];
 	}
 }
 
--(IBAction)variableButton:(UIButton *)sender
+- (void) checkIf_Store_IsEqualTo:(UIButton *)sender
 {
-	
-	if (self.userIsInTheMiddleOfTypingANumber)
-	{
-		self.userIsInTheMiddleOfTypingANumber = YES;
-	}
-	//renew the display and set the variable in the model
-	else if(([self initiateCheckWhetherLastElementInExpressionCorrespondsWith:[NSArray arrayWithObjects:@"+", @"-", @"*", @"/", nil]]) ||	([self checkIfExpressionIsEmpty]))
-	{
-		NSString *tempString = [[sender titleLabel] text];
-		[self.brain setVariableAsOperand:tempString];
-		[self changeDisplay:@""];
-	}
-	else
-	{
-		//alert view then get out of this method
-	}
+	if([@"Store" isEqualToString:[[sender titleLabel] text]])
+		self.storedInformation = YES;
+}
+//
+////////////////
+
+
+////////////////
+//
+- (IBAction) solve:(UIButton *) sender
+{
+	[self checkToMakeSureExpressionIsNotEmpty];
 }
 
-// executed when a memory related button is pressed.
-
-- (IBAction)memoryRelatedButtonIsPressed:(UIButton *)sender
-{	
-	if(![self checkIfVariableIsInExpression])
-	{
-		double result = [self.brain performMemoryOperation:[[sender titleLabel] text] toStore:[display text]];
-		
-		if([@"Recall" isEqualToString:[[sender titleLabel] text]] && self.storedInformation)
-		{
-			[self setUserIsNotTypingAndPeriodReset];
-			[self changeDisplay:[NSString stringWithFormat:@"%g", result]];
-		}
-		else if([@"Store" isEqualToString:[[sender titleLabel] text]])
-		{
-			self.storedInformation = YES;
-		}
-	}
-}
-
-- (IBAction)solve:(UIButton *)sender
+- (void) checkToMakeSureExpressionIsNotEmpty
 {
-	//make sure expression is not empty
 	if(![self checkIfExpressionIsEmpty])
-	{
-		//make sure expression has a variable
-		if(!([[CalculatorBrain variablesInExpression:self.brain.expression] count] == 0))
-		{
-			NSDictionary *values = [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:32.3],@"x",
-									[NSNumber numberWithFloat:2.2],@"a",
-									[NSNumber numberWithFloat:-3.3],@"b",nil];
-			[self.brain addNumber:nil andOperation:@"="];
-			double result = [CalculatorBrain evaluateExpression:self.brain.expression usingVariableValues:values];
-			[display setText:[NSString stringWithFormat:@"%g", result]];
-		}
-	}
+		[self checkToMakeSureVariableIsInExpression];
+}
+- (void) checkToMakeSureVariableIsInExpression
+{
+	if(!([[CalculatorBrain variablesInExpression:self.brain.expression] count] == 0))
+		[self callToSolveInCalculatorBrainAndDisplay];
+}
+- (void) callToSolveInCalculatorBrainAndDisplay
+{
+	[self.brain toExpression_Add:nil andAlsoAdd:@"="];
+	[display setText:[NSString stringWithFormat:@"%g", [CalculatorBrain evaluateExpression:self.brain.expression 
+																	   usingVariableValues:self.variableValues]]];
+}
+//
+////////////////
+
+-(NSDictionary *) variableValues
+{
+	return [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:32.3],@"x",
+			[NSNumber numberWithFloat:2.2],@"a",
+			[NSNumber numberWithFloat:-3.3],@"b",nil];
+}
+
+-(NSArray *) fundamentalOperations
+{
+	return [NSArray arrayWithObjects:@"+", @"-", @"*", @"/", nil];
 }
 
 -(void) viewDidUnload

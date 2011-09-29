@@ -11,10 +11,12 @@
 
 @interface CalculatorViewController : UIViewController
 {
-	@private
+@private
 	IBOutlet UILabel *display;
 	CalculatorBrain *brain;
 	NSString *typingNumber;
+	NSArray *fundamentalOperations;
+	NSDictionary *variableValues;
 	BOOL userIsInTheMiddleOfTypingANumber;
 	BOOL storedInformation;
 	BOOL userPressedAVariable;
@@ -22,6 +24,9 @@
 	BOOL initialBooleanDigit;
 	BOOL initialBooleanVariable;
 	BOOL periodIsEntered;
+	
+//	DigitPressed *digitPressed;
+//	NSArray *buttonMethodInstances;
 }
 
 - (IBAction)digitPressed:(UIButton *)sender;
