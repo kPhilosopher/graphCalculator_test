@@ -7,7 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "GraphView.h"
+#import "CalculatorBrain.h"
 
-@interface GraphCalculatorViewController : UIViewController
 
+@interface GraphCalculatorViewController : UIViewController <GraphViewDelegate>
+{
+	@private
+	id expressionToEvaluate;
+}
+
+- (IBAction)changeScale:(UIButton *)sender;
+@property (retain) id expressionToEvaluate;
 @end

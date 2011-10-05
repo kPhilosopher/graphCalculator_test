@@ -152,6 +152,7 @@
 - (void) checkToMakeSureExpressionIsNotEmpty;
 - (void) checkToMakeSureVariableIsInExpression;
 - (void) callToSolveInCalculatorBrainAndDisplay;
+- (void) addEqualOperationAtEndToEnsureCorrectCalculations;
 @end
 
 @implementation CalculatorViewController
@@ -397,18 +398,38 @@
 }
 - (void) callToSolveInCalculatorBrainAndDisplay
 {
-	[self.brain toExpression_Add:nil andAlsoAdd:@"="];
+	[self addEqualOperationAtEndToEnsureCorrectCalculations];
 	[display setText:[NSString stringWithFormat:@"%g", [CalculatorBrain evaluateExpression:self.brain.expression 
 																	   usingVariableValues:self.variableValues]]];
+}
+
+- (void) addEqualOperationAtEndToEnsureCorrectCalculations
+{
+	[self.brain toExpression_Add:nil andAlsoAdd:@"="];
+}
+//
+////////////////
+
+
+////////////////
+//
+- (IBAction)graphTheExpression:(UIButton *)sender
+{
+	GraphCalculatorViewController *graphCalculatorViewController = [[GraphCalculatorViewController alloc] init];
+	graphCalculatorViewController.title = @"Graph";
+	[self addEqualOperationAtEndToEnsureCorrectCalculations];
+	graphCalculatorViewController.expressionToEvaluate = self.brain.expression;
+	[self.navigationController pushViewController:graphCalculatorViewController animated:YES];
+	[graphCalculatorViewController release];
 }
 //
 ////////////////
 
 -(NSDictionary *) variableValues
 {
-	return [[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:32.3],@"x",
-			[NSNumber numberWithFloat:2.2],@"a",
-			[NSNumber numberWithFloat:-3.3],@"b",nil];
+	return [[[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:32.3],@"x",nil] autorelease];
+//			[NSNumber numberWithFloat:2.2],@"a",
+//			[NSNumber numberWithFloat:-3.3],@"b",nil];
 }
 
 -(NSArray *) fundamentalOperations

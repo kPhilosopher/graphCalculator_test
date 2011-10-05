@@ -7,24 +7,66 @@
 //
 
 #import "GraphCalculatorViewController.h"
+#define POSITIVE_UNIT 1
+#define NEGATIVE_UNIT -1
+
+
+@interface GraphCalculatorViewController ()
+
+
+@end
 
 @implementation GraphCalculatorViewController
+@synthesize expressionToEvaluate;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (IBAction)changeScale:(UIButton *)sender
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
+	if([self.view isKindOfClass:[GraphView class]])
+	{
+		GraphView *currentView = (GraphView *)self.view;
+		if ([[[sender titleLabel] text] isEqualToString:@"+"])
+			[currentView changePointsPerUnitWith:POSITIVE_UNIT];
+		else if ([[[sender titleLabel] text] isEqualToString:@"-"])
+			[currentView changePointsPerUnitWith:NEGATIVE_UNIT];
+		else
+		{
+			NSLog(@"wrong button is linked to changeScale action method");
+			return;
+		}
+	}
 }
 
-- (void)didReceiveMemoryWarning
+- (NSArray *) evaluateExpressionFor: (GraphView *)requestor
 {
-    // Releases the view if it doesn't have a superview.
-    [super didReceiveMemoryWarning];
-    
-    // Release any cached data, images, etc that aren't in use.
+	CGFloat unitsPerPoint = 1/(requestor.pointsPerUnit);
+	CGFloat originPointXValue;
+	CGFloat numberOfPointsInPositiveDomain;
+	CGFloat numberOfPointsInNegativeDomain;
+	CGFloat largestXPoint = requestor.bounds.size.width - 1;
+	
+	CGFloat negativeStartingValue;
+	
+	if([self interfaceOrientation] == UIInterfaceOrientationPortrait)
+	{
+		originPointXValue = requestor.origin.x;
+		numberOfPointsInPositiveDomain = largestXPoint - originPointXValue;
+		numberOfPointsInNegativeDomain = originPointXValue;
+		
+		negativeStartingValue = -unitsPerPoint * numberOfPointsInNegativeDomain;
+	}
+
+	NSMutableArray *rangeValues = [[[NSMutableArray alloc] init] autorelease];
+	CGFloat valueAtPoint = negativeStartingValue;
+	NSDictionary *temporaryDictionary;
+	
+	for (int count = 0; count < numberOfPointsInNegativeDomain + 1 + numberOfPointsInPositiveDomain; count++) 
+	{
+		temporaryDictionary = [[[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithFloat:valueAtPoint],@"x",nil] autorelease];
+		[rangeValues addObject:[NSNumber numberWithDouble:[CalculatorBrain evaluateExpression:self.expressionToEvaluate usingVariableValues:temporaryDictionary]]];
+		
+		valueAtPoint += unitsPerPoint;
+	}
+	return [NSArray arrayWithArray:rangeValues];
 }
 
 #pragma mark - View lifecycle
@@ -46,6 +88,12 @@
 {
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
+- (void)dealloc
+{
+	self.expressionToEvaluate = nil;
+	[super dealloc];
 }
 
 @end

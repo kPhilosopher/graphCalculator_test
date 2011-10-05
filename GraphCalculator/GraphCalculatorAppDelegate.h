@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CalculatorViewController.h"
 
 @interface GraphCalculatorAppDelegate : NSObject <UIApplicationDelegate>
 

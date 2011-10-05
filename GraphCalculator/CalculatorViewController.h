@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "CalculatorBrain.h"
+#import "GraphCalculatorViewController.h"
 
 @interface CalculatorViewController : UIViewController
 {
@@ -24,9 +25,6 @@
 	BOOL initialBooleanDigit;
 	BOOL initialBooleanVariable;
 	BOOL periodIsEntered;
-	
-//	DigitPressed *digitPressed;
-//	NSArray *buttonMethodInstances;
 }
 
 - (IBAction)digitPressed:(UIButton *)sender;
@@ -35,4 +33,5 @@
 - (IBAction)clear;
 - (IBAction)variableButton:(UIButton *)sender;
 - (IBAction)solve:(UIButton *)sender;
+- (IBAction)graphTheExpression:(UIButton *)sender;
 @end

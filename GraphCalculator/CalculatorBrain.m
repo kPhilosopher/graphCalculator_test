@@ -175,8 +175,7 @@
 
 -(void) setOperandInCalculatorBrainAsVariableValue
 {
-	self.temporaryBrain.operand = [[self.variableDictionary objectForKey:[CalculatorBrain stripDownElement:self.iterationElement]]
-								   doubleValue];
+	self.temporaryBrain.operand = [[self.variableDictionary objectForKey:[CalculatorBrain stripDownElement:self.iterationElement]] doubleValue];
 }
 
 
@@ -440,6 +439,7 @@
 	else if ([operation isEqualToString:@"sin"])
 	{
 		self.operand = sin(self.operand*M_PI/180);
+//		self.operand = sin(self.operand);
 	}
 	else if ([operation isEqualToString:@"cos"])
 	{

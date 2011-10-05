@@ -47,12 +47,12 @@
 + (void)drawHashMarksInRect:(CGRect)bounds originAtPoint:(CGPoint)axisOrigin scale:(CGFloat)pointsPerUnit
 {
 	if (!pointsPerUnit) return;
-
+	
 	if (((axisOrigin.x < bounds.origin.x) || (axisOrigin.x > bounds.origin.x+bounds.size.width)) &&
 		((axisOrigin.y < bounds.origin.y) || (axisOrigin.y > bounds.origin.y+bounds.size.height))) {
 		return;
 	}
-
+	
 	int unitsPerHashmark = MIN_PIXELS_PER_HASHMARK * 2 / pointsPerUnit;
 	if (!unitsPerHashmark) unitsPerHashmark = 1;
 	CGFloat pixelsPerHashmark = pointsPerUnit * unitsPerHashmark;
