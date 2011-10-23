@@ -8,8 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "CalculatorViewController.h"
+#import "WindowsSizeRetrieverProtocol.h"
 
-@interface GraphCalculatorAppDelegate : NSObject <UIApplicationDelegate>
+@interface GraphCalculatorAppDelegate : NSObject <UIApplicationDelegate, WindowsSizeRetrieverProtocol>
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 

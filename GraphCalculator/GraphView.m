@@ -13,64 +13,138 @@
 #define Y_MIDPOINT self.bounds.size.height/2
 
 @interface GraphView ()
+@property CGContextRef contextForPlot;
+@property (retain) NSArray *arrayOfRangeValuesForPlot;
 
-@property (retain) IBOutlet id <GraphViewDelegate> delegate;
-
-- (void) drawGraphOfExpression;
+-(void) drawPlotOfExpression;
+-(void) setScaleRatioToContentScaleRatioOrOne;
+-(void) usingTheDelegateMethod_SetArrayOfRangeValuesForPlot;
+-(BOOL) checkWhetherExpressionIsDefinedInGraphCalculatorController;
+-(void) contextSetupPriorToDrawingThePlot;
+-(void) retrieveCurrentContextAndPushContext;
+-(void) setupTheInitialConditionOfThePlotPath;
+-(void) notifyContextThatPathPlottingWillBegin;
+-(void) moveToTheInitialPointOfThePlotToCommenceLineDrawing;
+-(void) setStrokeOfThePlotToRedColor;
+-(void) loopThroughTheRangeValuesGivenByTheDelegateToPlotTheExpression;
+-(void) connectTheLinesBetweenCoordinatesThatCorrespondsToTheFollowing:(float) xIteration;
+-(void) addLineToTheFollowing:(CGPoint)point;
+-(void) finishOffThePlottingContext;
+-(void) fillInTheStrokePathDefinedByThePreviousLoop;
 @end
 
 @implementation GraphView
-@synthesize pointsPerUnit, origin;
+@synthesize pointsPerUnit, origin, x_delta, y_delta;
+@synthesize scaleRatioForPlot, contextForPlot, arrayOfRangeValuesForPlot;
 @synthesize delegate;
 
-- (void)drawRect:(CGRect)rect
+-(void)drawRect:(CGRect)rect
 {
-	
 	[AxesDrawer drawAxesInRect:self.bounds originAtPoint:self.origin scale:self.pointsPerUnit];
-	[self drawGraphOfExpression];
+	[self drawPlotOfExpression];
 }
 
-- (void)changePointsPerUnitWith:(int) positiveOrNegativeUnit
+////////////////
+////////////////
+//
+-(void) drawPlotOfExpression
 {
-	self.pointsPerUnit = self.pointsPerUnit * ((3.0 + positiveOrNegativeUnit) / 3.0);
-	[self setNeedsDisplay];
+	[self setScaleRatioToContentScaleRatioOrOne];
+	[self usingTheDelegateMethod_SetArrayOfRangeValuesForPlot];
+	if ([self checkWhetherExpressionIsDefinedInGraphCalculatorController])
+		return;
+	[self contextSetupPriorToDrawingThePlot];
+	[self loopThroughTheRangeValuesGivenByTheDelegateToPlotTheExpression];
+	[self finishOffThePlottingContext];
 }
-
-- (void) drawGraphOfExpression
-{
-	
-	CGContextRef context = UIGraphicsGetCurrentContext();
-	UIGraphicsPushContext(context);
-	CGContextBeginPath(context);
-	
-	NSArray *arrayOfRangeValues = [self.delegate evaluateExpressionFor:self];
-	int yPoint = (self.bounds.size.height / 2) - [[arrayOfRangeValues objectAtIndex:0] doubleValue] * self.pointsPerUnit;
-	CGContextMoveToPoint(context, 0, yPoint);
-	
-	for (int xPoint = 1; xPoint < [arrayOfRangeValues count]; xPoint++) 
+	-(void) setScaleRatioToContentScaleRatioOrOne
 	{
-		int yPoint = (self.bounds.size.height / 2) - [[arrayOfRangeValues objectAtIndex:xPoint] doubleValue] * self.pointsPerUnit;
-		CGContextAddLineToPoint(context, xPoint, yPoint);
+		self.scaleRatioForPlot = 1.0;
+		if ([self respondsToSelector:@selector(setContentScaleFactor)]) 
+			self.scaleRatioForPlot = self.contentScaleFactor;
 	}
-	
-	[[UIColor redColor] setStroke];
-	CGContextStrokePath(context);
-	
-	UIGraphicsPopContext();
+	-(void) usingTheDelegateMethod_SetArrayOfRangeValuesForPlot
+	{
+		self.arrayOfRangeValuesForPlot = [self.delegate evaluateMultipleDomainValuezCorrespondingExpressionSolutionFor:self];
+	}
+	-(BOOL) checkWhetherExpressionIsDefinedInGraphCalculatorController
+	{
+		return ([self.arrayOfRangeValuesForPlot count] == 0);
+	}
+	-(void) contextSetupPriorToDrawingThePlot
+	{
+		[self retrieveCurrentContextAndPushContext];
+		[self setupTheInitialConditionOfThePlotPath];
+		[self setStrokeOfThePlotToRedColor];
+	}
+		-(void) retrieveCurrentContextAndPushContext 
+		{
+			self.contextForPlot = UIGraphicsGetCurrentContext();
+			UIGraphicsPushContext(self.contextForPlot);
+		}
+		-(void) setupTheInitialConditionOfThePlotPath
+		{
+			[self notifyContextThatPathPlottingWillBegin];
+			[self moveToTheInitialPointOfThePlotToCommenceLineDrawing];
+		}
+			-(void) notifyContextThatPathPlottingWillBegin
+			{
+				CGContextBeginPath(self.contextForPlot);
+			}
+			-(void) moveToTheInitialPointOfThePlotToCommenceLineDrawing
+			{
+				int yPoint = (self.bounds.size.height / 2) + self.y_delta - [[self.arrayOfRangeValuesForPlot objectAtIndex:0] doubleValue] * self.pointsPerUnit;
+				CGContextMoveToPoint(self.contextForPlot, 0, yPoint);
+			}
+		-(void) setStrokeOfThePlotToRedColor
+		{
+			[[UIColor redColor] setStroke];
+		}
+	-(void) loopThroughTheRangeValuesGivenByTheDelegateToPlotTheExpression
+	{
+		for (float xIteration = 1; xIteration < [self.arrayOfRangeValuesForPlot count]; xIteration++) 
+			[self connectTheLinesBetweenCoordinatesThatCorrespondsToTheFollowing:xIteration];
+	}
+		-(void) connectTheLinesBetweenCoordinatesThatCorrespondsToTheFollowing:(float) xIteration
+		{
+			CGFloat yPoint =
+			(self.bounds.size.height / 2.0) + self.y_delta - [[self.arrayOfRangeValuesForPlot objectAtIndex:xIteration] doubleValue] * self.pointsPerUnit;
+			CGFloat xPoint = xIteration / self.scaleRatioForPlot;
+			[self addLineToTheFollowing:(CGPoint)CGPointMake(xPoint, yPoint)];
+		}
+			-(void) addLineToTheFollowing:(CGPoint)point
+			{
+				CGContextAddLineToPoint(self.contextForPlot, point.x, point.y);
+			}
+	-(void) finishOffThePlottingContext
+	{
+		[self fillInTheStrokePathDefinedByThePreviousLoop];
+		UIGraphicsPopContext();
+	}
+		-(void) fillInTheStrokePathDefinedByThePreviousLoop
+		{
+			CGContextStrokePath(self.contextForPlot);
+		}
+//
+////////////////
+////////////////
+
+-(CGPoint) origin
+{
+	return CGPointMake(X_MIDPOINT + self.x_delta, Y_MIDPOINT + self.y_delta);
 }
 
-
-
-- (CGFloat) pointsPerUnit
+-(CGFloat) pointsPerUnit
 {
 	if (!pointsPerUnit)
-		self.pointsPerUnit = DEFAULT_SCALE_VALUE;
+		pointsPerUnit = DEFAULT_SCALE_VALUE;
 	return pointsPerUnit;
 }
 
-- (CGPoint) origin
+-(void) dealloc
 {
-	return CGPointMake(X_MIDPOINT, Y_MIDPOINT);
+	[arrayOfRangeValuesForPlot release];
+	[super dealloc];
 }
 
 @end

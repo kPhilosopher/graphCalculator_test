@@ -9,14 +9,17 @@
 #import <UIKit/UIKit.h>
 #import "GraphView.h"
 #import "CalculatorBrain.h"
+#import "WindowsSizeRetrieverProtocol.h"
 
-
-@interface GraphCalculatorViewController : UIViewController <GraphViewDelegate>
+@interface GraphCalculatorViewController : UIViewController <GraphViewDelegate, UISplitViewControllerDelegate>
 {
 	@private
 	id expressionToEvaluate;
+	id <WindowsSizeRetrieverProtocol> windowsSizeRetrieverDelegate;
+	GraphView *graphView;
 }
 
-- (IBAction)changeScale:(UIButton *)sender;
+//-(IBAction)changeScale:(UIButton *)sender;
 @property (retain) id expressionToEvaluate;
+@property (retain) id <WindowsSizeRetrieverProtocol> windowsSizeRetrieverDelegate;
 @end

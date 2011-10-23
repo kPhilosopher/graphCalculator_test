@@ -13,34 +13,30 @@
 {
 	@private
 	double operand;
-	
-	NSString *waitingOperation;
 	double waitingOperand;
 	double memoryOperand;
+	NSString *waitingOperation;
 	NSMutableArray *internalExpression;	
 }
 
 
 @property double operand;
-
-//new 
 @property (readonly) id expression;
 
-- (double)performOperation:(NSString *)operation;
-- (double)performMemoryOperation:(NSString *)operation toStore:(NSString *)store;//done
++(double) evaluateExpression:(id) anExpression usingVariableValues:(NSDictionary *) variables;
++(NSSet *) variablesInExpression:(id) anExpression;
++(NSString *) descriptionOfExpression:(id) anExpression;
++(id) propertyListForExpression:(id) anExpression;
++(id) expressionForPropertyList:(id) propertyList;
++(id) lastItemInExpression:(id) anExpression;
++(NSString *) stripDownElement:(NSString *) string;
 
-//new
-- (void)setVariableAsOperand:(NSString *)variableName;//done
-+ (double)evaluateExpression:(id)anExpression usingVariableValues:(NSDictionary *)variables;
-+ (NSSet *)variablesInExpression:(id)anExpression;//done
-+ (NSString *)descriptionOfExpression:(id)anExpression;//done
-+ (id)propertyListForExpression:(id)anExpression;//done
-+ (id)expressionForPropertyList:(id)propertyList;//done
-- (void)toExpression_Add:(NSString *)number andAlsoAdd:(NSString *)operation;//done
-
-+ (id)lastItemInExpression:(id)anExpression;//done
+-(double) performOperation:(NSString *) operation;
+-(double) performMemoryOperation:(NSString *) operation toStore:(NSString *) store;
+-(void) setVariableAsOperand:(NSString *) variableName;
+-(void) toExpression_Add:(NSString *) number andAlsoAdd:(NSString *) operation;
 -(void) clearOperations;
 
-+ (NSString *)stripDownElement:(NSString *)string;
+
 
 @end

@@ -15,14 +15,43 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Override point for customization after application launch.
-	UINavigationController *navigation = [[UINavigationController alloc] init];
+	
 	CalculatorViewController *calculatorView = [[CalculatorViewController alloc] init];
+	calculatorView.graphCalculatorViewController = [[GraphCalculatorViewController alloc] init];
+	
 	calculatorView.title = @"Calculator";
+	calculatorView.graphCalculatorViewController.title = @"Graph";
+	
+	calculatorView.windowsSizeRetrieverDelegate = self;
+	calculatorView.graphCalculatorViewController.windowsSizeRetrieverDelegate = self;
+	
+	UINavigationController *navigation = [[UINavigationController alloc] init];
 	[navigation pushViewController:calculatorView animated:NO];
 	[calculatorView release];
-	[self.window addSubview:navigation.view];
+	
+	if (self.window.bounds.size.height > 500)
+	{
+		UISplitViewController *splitView = [[UISplitViewController alloc] init];
+		UINavigationController *rightView = [[UINavigationController alloc] init];
+		splitView.delegate = calculatorView.graphCalculatorViewController;
+		[rightView pushViewController:calculatorView.graphCalculatorViewController animated:NO];
+		splitView.viewControllers = [NSArray arrayWithObjects:navigation, rightView, nil];
+		[rightView release];
+		[navigation release];
+		[self.window addSubview:splitView.view];
+	}
+	else
+	{
+		[self.window addSubview:navigation.view];
+	}
 	[self.window makeKeyAndVisible];
     return YES;
+}
+
+- (CGRect) getCurrentWindowsCGRect:(UIViewController *)requestor
+{
+	CGRect theRect = [self.window bounds];
+	return CGRectMake(theRect.origin.x, theRect.origin.y, theRect.size.width, theRect.size.height);
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

@@ -12,17 +12,26 @@
 @class GraphView;
 
 @protocol GraphViewDelegate
-- (NSArray *) evaluateExpressionFor: (GraphView *)requestor;
+-(NSArray *) evaluateMultipleDomainValuezCorrespondingExpressionSolutionFor: (GraphView *)requestor;
 @end
 
 @interface GraphView : UIView
 {
 	@private
 	CGFloat pointsPerUnit;
+	CGFloat x_delta;
+	CGFloat y_delta;
 	CGPoint origin;
 	IBOutlet id <GraphViewDelegate> delegate;
+	CGFloat scaleRatioForPlot;
+	CGContextRef contextForPlot;
+	NSArray *arrayOfRangeValuesForPlot;
 }
-- (void)changePointsPerUnitWith:(int) positiveOrNegativeUnit;
+
 @property (nonatomic) CGFloat pointsPerUnit;
+@property (nonatomic) CGFloat x_delta;
+@property (nonatomic) CGFloat y_delta;
 @property (nonatomic) CGPoint origin;
+@property CGFloat scaleRatioForPlot;
+@property (retain) IBOutlet id <GraphViewDelegate> delegate;
 @end
